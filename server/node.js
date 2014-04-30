@@ -1,65 +1,103 @@
-// source emo$ server:
-{
-  var __dirname = './builds/src/' ;
-  var __portNumber = 8889;
-  var connect = require('connect');
-  connect.createServer(
-    connect.static(__dirname)
-  ).listen(__portNumber);
-  console.log('New Emo$ server is running, __dirname = ' + __dirname + ', port = ' + __portNumber);
-}
-// prod emo$ server:
-{
-  var __dirname = './builds/prod/' ;
-  var __portNumber = 8999;
-  var connect = require('connect');
-  connect.createServer(
-    connect.static(__dirname)
-  ).listen(__portNumber);
-  console.log('New Emo$ server is running, __dirname = ' + __dirname + ', port = ' + __portNumber);
-}
-// temp emo$ server:
-{
-  var __dirname = './builds/temp1/' ;
-  var __portNumber = 8666;
-  var connect = require('connect');
-  connect.createServer(
-    connect.static(__dirname)
-  ).listen(__portNumber);
-  console.log('New Emo$ server is running, __dirname = ' + __dirname + ', port = ' + __portNumber);
-}
-//emo$ server - tests, jasmine:
-{
-  var __dirname = './tests/jasmine/' ;
-  var __portNumber = 8804;
-  var connect = require('connect');
-  connect.createServer(
-    connect.static(__dirname)
-  ).listen(__portNumber);
-  console.log('New Emo$ server is running, __dirname = ' + __dirname + ', port = ' + __portNumber);
-}
-// data server:
-{
-  // install express package: 'npm install express'
-  var __dirname = './data',
-    __portNumber = 8899;
-  var express = require('express'),
-    http = require('http');
-  var app = express();
+//	Customization
 
-  app.all('*', function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With");
-    console.log('1' + req);
-    next();
-  });
-  app.get('*', function(req, res, next){
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With");
-    console.log('__dirname: ' +__dirname + req.originalUrl);
-    res.sendfile(__dirname + req.originalUrl);
-  });
+var appPort = 9001;
 
-  http.createServer(app).listen(__portNumber);
-  console.log('New Data server is running, __dirname = ' + __dirname + ', port = ' + __portNumber);
+// Librairies
+
+var express = require('express');
+var app = express();
+var http = require('http')
+  , server = http.createServer(app)
+  , io = require('socket.io').listen(server);
+
+
+var jade = require('jade');
+// var io = require('socket.io').listen(app);
+var pseudoArray = ['admin']; //block the admin username (you can disable it)
+
+// Views Options
+debugger;
+app.set('views', './src/views');
+//app.set('views', __dirname + '/views');
+app.set('view engine', 'jade');
+app.set("view options", { layout: false });
+
+/*app.configure(function() {
+	app.use(express.static(__dirname + '/public'));
+});*/
+app.use(express.static('./src'));
+//app.use(express.static('./public'));
+//app.use(express.static(__dirname + '/public'));
+
+// Render and send the main page
+
+app.get('/', function(req, res){
+  res.render('home.jade');
+});
+server.listen(appPort);
+// app.lten(appPort);
+console.log("Server listening on port " + appPort);
+
+// Handle the socket.io connections
+
+var users = 0; //count the users
+
+io.sockets.on('connection', function (socket) { // First connection
+	users += 1; // Add 1 to the count
+	reloadUsers(); // Send the count to all the users
+	socket.on('message', function (data) { // Broadcast the message to all
+		if(pseudoSet(socket))
+		{
+			var transmit = {date : new Date().toISOString(), pseudo : returnPseudo(socket), message : data};
+			socket.broadcast.emit('message', transmit);
+			console.log("user "+ transmit['pseudo'] +" said \""+data+"\"");
+		}
+	});
+	socket.on('setPseudo', function (data) { // Assign a name to the user
+		if (pseudoArray.indexOf(data) == -1) // Test if the name is already taken
+		{
+			socket.set('pseudo', data, function(){
+				pseudoArray.push(data);
+				socket.emit('pseudoStatus', 'ok');
+				console.log("user " + data + " connected");
+			});
+		}
+		else
+		{
+			socket.emit('pseudoStatus', 'error') // Send the error
+		}
+	});
+	socket.on('disconnect', function () { // Disconnection of the client
+		users -= 1;
+		reloadUsers();
+		if (pseudoSet(socket))
+		{
+			var pseudo;
+			socket.get('pseudo', function(err, name) {
+				pseudo = name;
+			});
+			var index = pseudoArray.indexOf(pseudo);
+			pseudo.slice(index - 1, 1);
+		}
+	});
+});
+
+function reloadUsers() { // Send the count of the users to all
+	io.sockets.emit('nbUsers', {"nb": users});
+}
+function pseudoSet(socket) { // Test if the user has a name
+	var test;
+	socket.get('pseudo', function(err, name) {
+		if (name == null ) test = false;
+		else test = true;
+	});
+	return test;
+}
+function returnPseudo(socket) { // Return the name of the user
+	var pseudo;
+	socket.get('pseudo', function(err, name) {
+		if (name == null ) pseudo = false;
+		else pseudo = name;
+	});
+	return pseudo;
 }

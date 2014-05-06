@@ -19,11 +19,15 @@ canvas#canvas {
   width: 100% !important;
 }
 .message {
-  width: 30% !important;
+  width: 70% !important;
   border-radius: 2px !important;
   float: left;
   position : relative;
 
+}
+
+.message p {
+  text-align: left;
 }
 
 /*original css:*/

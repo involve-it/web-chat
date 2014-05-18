@@ -1,11 +1,8 @@
 requirejs.config({
   paths: {
-    'api' : 'http://localhost:8666/js/_api_',
-    'art' : 'http://localhost:8666/js/_art_',
-    'gui' : 'http://localhost:8666/js/_gui_',
-    'engine' : 'http://localhost:8666/js/_engine_',
-    'core' : 'http://localhost:8666/js/_core_',
-    'libs' : 'http://localhost:8666/js/_libs_',
+    'core' : 'http://localhost:8999/emo',
+    //'core' : 'emo',
+    //'libs' : 'http://localhost:8999/libs',
 
     'underscore': '../libs/underscore-1.6.0',
     'jquery': '../libs/jquery-1.7.1.min',
@@ -23,14 +20,10 @@ requirejs.config({
     'underscore': {
       exports: ['_']
     },
-    'libs' : {
-      deps : ['core.helpers/static.js']
-    },
-
-    'core' : {
-      //deps : ['libs']
-    },
-    'gui': {
+    'xml2json' : {
+      //exports : ['global.libs.x2js']
+    }
+    /*'gui': {
       deps: ['core', 'engine']
     },
     'art': {
@@ -41,19 +34,37 @@ requirejs.config({
     },
     'engine' : {
       deps : ['core']
-    }
+    }*/
   }
 });
+global = window.Emo = window.emo = {};
 
-window.emo$ = {};
 
 try {
-  require(['chatter.box', 'art', 'gui', 'api', 'core', 'engine', 'libs'], function (ChatterBox) {
+  require(['chatter.box', 'jquery', 'underscore', 'xml2json'], function(ChatterBox) {
+    debugger;
+    return require(['core'], function() {
+
+
+      debugger;
+
+      require(['core/main'] , function() {
+        debugger;
+
+        chatterBox = new ChatterBox($('#canvas'), $('#messageInput'), $('#submit'))
+      });
+    });
+    });
+} catch (e) {
+  debugger;
+}
+
+/*  require(['chatter.box', 'art', 'gui', 'api', 'core', 'engine', 'libs'], function (ChatterBox) {
     chatterBox = new ChatterBox($('#canvas'), $('#messageInput'), $('#submit'))
 
     debugger;
   });
-} catch (e) {}
+} catch (e) {}*/
 /*
 require(['libs', 'core'], function() {
   return require(['engine'], function() {

@@ -2,17 +2,20 @@ define([], function() {
   return window.EmpathyBox = (function() {
     function EmpathyBox($canvas, $textArea, $butt) {
       var that;
+      a = $canvas;
+      that = this;
+      debugger;
       this.$canvas = $canvas;
       this.$textArea = $textArea;
       this.$butt = $butt;
       that = this;
-      this.empathyPanel = new emo$.Gui.EmpathyPanel(100, emo$.Engine.Emotion.SynesthesiatorEmotion, 'Synemania', $canvas);
+      emotion = $textArea.emo()
+      canvasArt1 = $canvas.art();
+      //this.empathyPanel = new emo$.Gui.EmpathyPanel(100, emo$.Engine.Emotion.SynesthesiatorEmotion, 'Synemania', $canvas);
       this.$textArea.keypress(function(e) {
         var text;
         if (e.which === 13) {
-          //text = $(this).text().trim();
-          text = $(this).text().trim()!==''? $(this).text().trim() : $(this).val().trim();
-          that.empathyPanel.fireSynesthesiator(text);
+          emotion = $textArea.emo()
         }
       });
       var socket = io.connect();
@@ -21,16 +24,19 @@ define([], function() {
         //addMessage(data['message'], data['pseudo'], new Date().toISOString(), false);
         //console.log(data);
         var text = data;
-        return that.empathyPanel.fireSynesthesiator(text);
+        // todo : make this more nice:
+        $('#incomingMessageInput').text(data.message);
+        emotion = $('#incomingMessageInput').emo();
+        $('#incomingMessageInput').text('');
+        //return that.empathyPanel.fireSynesthesiator(text);
       });
       this.$butt.click(function(e) {
-        var text;
-        text = that.$textArea.text().trim()!==''? that.$textArea.text().trim() : that.$textArea.val().trim();
-        return that.empathyPanel.fireSynesthesiator(text);
+        emotion = $textArea.emo()
       });
       setInterval(function() {
         var results;
-        return results = that.empathyPanel.applet.draw();
+        canvasArt1.draw();
+        //return results = that.empathyPanel.applet.draw();
       }, 10);
     }
 

@@ -16,14 +16,15 @@ html
         //script(src="http://localhost:8666/js/_engine_.js")
     body
         div.container#main
-            div.navbar.navbar-fixed-top
-                div.navbar-inner
+            div.navbar.navbar-fixed-top.navbar-header
                     div.container
                         a.brand(href="#") Tetamo.Web.Chat
             div#chatEntries
                 canvas#canvas
             div.row#entries
                 input(type='text')#messageInput
+                input(type='text', style='display:none')#incomingMessageInput
+
                 div.btn-group
                     button.btn#submit(data-loading-text="Send") Send
                     button.btn.dropdown-toggle(data-toggle="dropdown")

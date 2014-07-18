@@ -1,6 +1,7 @@
 requirejs.config({
   paths: {
-    'core' : 'http://localhost:8999/emo',
+    'core' : 'http://localhost:8999/core',
+    'libs' : 'http://localhost:8999/libs',
     //'core' : 'emo',
     //'libs' : 'http://localhost:8999/libs',
 
@@ -41,9 +42,9 @@ global = window.Emo = window.emo = {};
 
 
 try {
-  require(['chatter.box', 'jquery', 'underscore', 'xml2json'], function(ChatterBox) {
+  require(['chatter.box', 'jquery', 'underscore', 'xml2json', 'libs'], function(ChatterBox) {
     debugger;
-    return require(['core'], function() {
+    return require([ 'core'], function() {
 
 
       debugger;
